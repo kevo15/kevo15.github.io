@@ -3,21 +3,176 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shadow Sprinter | Shadow Sprinter</title>
+<title>Shadow Sprinter</title>
+<meta name="description" content="Outrun your shadow in a 2D action platformer where your past moves become allies. Join the Android closed beta.">
+<meta property="og:title" content="Shadow Sprinter">
+<meta property="og:description" content="Outrun your shadow in a 2D action platformer where your past moves become allies. Join the Android closed beta.">
+<meta property="og:image" content="https://kevo15.github.io/assets/logo.png">
+<meta property="og:url" content="https://kevo15.github.io/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="assets/logo.png">
 <style>
-  :root { color-scheme: light dark; --fg: #1d1626; --muted: #5b4f6b; --accent: #9e4ed3; --bg: #fdfcff; }
-  @media (prefers-color-scheme: dark) { :root { --fg: #ede9fe; --muted: #bfa3e6; --accent: #eb15bc; --bg: #0b0612; } }
+  :root {
+    color-scheme: light dark;
+    --fg: #1d1626; --muted: #5b4f6b; --accent: #9e4ed3; --accent-2: #eb15bc; --gold: #c98a2b;
+    --bg: #fdfcff; --card: #ffffff; --border: #e6dcf3; --on-accent: #ffffff;
+    --hero-glow: rgba(158, 78, 211, 0.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #ede9fe; --muted: #bfa3e6; --accent: #b46cf0; --accent-2: #eb15bc; --gold: #e6a94a;
+      --bg: #0b0612; --card: #160d24; --border: #2e1f45; --hero-glow: rgba(235, 21, 188, 0.16);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-  main { max-width: 720px; margin: 0 auto; padding: 32px 16px 64px; }
-  h1 { margin: 0 0 4px; } h2 { margin-top: 28px; font-size: 1.1rem; color: var(--accent); }
-  .muted { color: var(--muted); } a { color: var(--accent); overflow-wrap: anywhere; }
-  nav { margin-bottom: 24px; display: flex; gap: 16px; }
+  a { color: var(--accent); overflow-wrap: anywhere; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+  header .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--fg); text-decoration: none; margin-right: auto; }
+  .brand img { width: 32px; height: 32px; border-radius: 8px; }
+  header nav { display: flex; align-items: center; gap: 16px; font-size: 0.95rem; }
+  header nav a:not(.btn) { color: var(--muted); text-decoration: none; }
+  header nav a:not(.btn):hover { color: var(--fg); }
+
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 999px; font-weight: 700; text-decoration: none; color: var(--on-accent);
+         background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 20px -6px var(--accent-2); transition: transform .15s, box-shadow .15s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px -6px var(--accent-2); }
+  .btn.small { padding: 7px 14px; font-size: 0.9rem; }
+  .btn.ghost { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+
+  .hero { position: relative; overflow: hidden; padding: 56px 0 64px; }
+  .hero::before { content: ""; position: absolute; inset: -20% -10% auto; height: 120%; background: radial-gradient(ellipse at 70% 40%, var(--hero-glow), transparent 60%); pointer-events: none; }
+  .hero .wrap > * { min-width: 0; }
+  .hero .wrap { position: relative; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; align-items: center; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tag { font-size: 0.8rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .tag.live { color: var(--accent-2); border-color: var(--accent-2); }
+  .hero-logo { width: 88px; height: 88px; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 10px 30px -10px var(--accent); }
+  h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.05; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .dev { color: var(--muted); margin: 0 0 20px; }
+  .tagline { font-size: 1.25rem; font-weight: 600; margin: 0 0 12px; }
+  .lead { color: var(--muted); margin: 0 0 28px; max-width: 52ch; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  .phone { justify-self: center; width: min(300px, 100%); }
+  .phone-frame { border-radius: 36px; padding: 10px; background: #120a1e; box-shadow: 0 0 0 1px var(--border), 0 30px 60px -20px var(--accent-2); }
+  .phone video { display: block; width: 100%; aspect-ratio: 540 / 1170; object-fit: cover; border-radius: 28px; background: #000; }
+  .caption { text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 12px; }
+
+  section { padding: 56px 0; }
+  .eyebrow { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin: 0 0 6px; }
+  h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin: 0 0 24px; letter-spacing: -0.01em; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  @media (min-width: 900px) { .features { grid-template-columns: repeat(3, 1fr); } .features .card:first-child { grid-column: span 2; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; }
+  .card .icon { font-size: 1.6rem; line-height: 1; margin-bottom: 10px; }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+
+  .beta { border-radius: 24px; padding: 40px 32px; background: var(--card); border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .beta::after { content: ""; position: absolute; right: -80px; top: -80px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, var(--hero-glow), transparent 70%); pointer-events: none; }
+  .beta > * { position: relative; }
+  .beta .intro { color: var(--muted); max-width: 60ch; margin: -12px 0 28px; }
+  .steps { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 16px; counter-reset: step; }
+  .steps li { display: grid; grid-template-columns: 40px 1fr; gap: 16px; align-items: start; counter-increment: step; }
+  .steps li::before { content: counter(step); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-weight: 800; color: var(--on-accent); background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  .steps h3 { margin: 6px 0 4px; font-size: 1.05rem; }
+  .steps p { margin: 0; color: var(--muted); }
+  .note { margin: 20px 0 0; font-size: 0.9rem; color: var(--muted); padding: 12px 16px; border-left: 3px solid var(--gold); background: color-mix(in srgb, var(--gold) 8%, transparent); border-radius: 0 10px 10px 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 0 40px; color: var(--muted); font-size: 0.9rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 16px; }
+
+  @media (max-width: 760px) {
+    .hero { padding: 32px 0 40px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 36px; }
+    header nav a.hide-sm { display: none; }
+    .beta { padding: 28px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 </style>
 </head>
-<body><main>
-<nav><a href="index.html">Shadow Sprinter</a><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a></nav>
-<h1>Shadow Sprinter</h1>
-<p>A ninja platformer for iOS and Android.</p>
-<ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms of Use</a></li></ul>
-</main></body>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="assets/logo.png" alt="">Shadow Sprinter</a>
+    <nav>
+      <a class="hide-sm" href="#features">Features</a>
+      <a class="hide-sm" href="privacy.html">Privacy</a>
+      <a class="hide-sm" href="terms.html">Terms</a>
+      <a class="btn small" href="#beta">Join beta</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <img class="hero-logo" src="assets/logo.png" alt="Shadow Sprinter logo">
+        <div class="tags"><span class="tag live">● Closed beta</span><span class="tag">Android</span></div>
+        <h1>Shadow Sprinter</h1>
+        <p class="dev">by KmGameForge</p>
+        <p class="tagline">Outrun your shadow. Your past moves become your allies.</p>
+        <p class="lead">A mobile-first 2D action platformer where shadow clones replay your earlier runs and turn into part of the puzzle. Take on 30 hand-built levels, race the par time on every stage, and unlock titles as you master each world.</p>
+        <div class="cta-row">
+          <a class="btn" href="#beta">Join the playtest</a>
+          <a class="btn ghost" href="#features">See features</a>
+        </div>
+      </div>
+      <figure class="phone" style="margin:0">
+        <div class="phone-frame">
+          <video src="assets/gameplay.mp4" poster="assets/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Shadow Sprinter gameplay footage"></video>
+        </div>
+        <figcaption class="caption">Gameplay from the 30-level beta</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <p class="eyebrow">The game</p>
+      <h2>What you'll play</h2>
+      <div class="features">
+        <div class="card"><div class="icon" aria-hidden="true">👥</div><h3>Shadow clone puzzles</h3><p>Your shadow clones replay your earlier runs, so every past move becomes part of the puzzle.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">🗺️</div><h3>30 levels in the beta</h3><p>Hand-built levels across multiple worlds, from the village out into the forest.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">⏱️</div><h3>Race the par time</h3><p>Every level has a par time. Finishing is just the start; mastery means beating the clock.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">🏅</div><h3>32 titles to unlock</h3><p>Earn titles like Initiate and Village Runner by clearing levels and hitting par times.</p></div>
+        <div class="card"><div class="icon" aria-hidden="true">🥷</div><h3>Physics-based movement</h3><p>Tight running and jumping with real-time collision and enemy AI.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="beta">
+    <div class="wrap">
+      <div class="beta">
+        <p class="eyebrow">Closed beta</p>
+        <h2>Play Shadow Sprinter early</h2>
+        <p class="intro">The beta is a closed test on Google Play. Joining the tester group gets you access in two quick steps.</p>
+        <ol class="steps">
+          <li><div><h3>Join the tester group</h3><p>Join the <a href="https://groups.google.com/g/shadow-sprinter-testers" target="_blank" rel="noopener">Shadow Sprinter testers</a> Google Group using the Google account on your Android phone.</p></div></li>
+          <li><div><h3>Download from Google Play</h3><p>In the group, open the conversation titled <strong>“Welcome to the Shadow Sprinter beta”</strong> and follow its link to install the game from Google Play.</p></div></li>
+        </ol>
+        <a class="btn" href="https://groups.google.com/g/shadow-sprinter-testers" target="_blank" rel="noopener">Join the tester group</a>
+        <p class="note">Use the same Google account that's signed in to the Play Store on your phone. Android only for now.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Shadow Sprinter by KmGameForge · <a href="mailto:k.z.marks15@gmail.com">Contact</a></span>
+    <nav><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a></nav>
+  </div>
+</footer>
+
+</body>
 </html>
